@@ -1,0 +1,18 @@
+# Backend
+backend/bin/
+backend/obj/
+backend/src/**/bin/
+backend/src/**/obj/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# SQLite (if local dev)
+*.db
+*.db-shm
+*.db-wal
+
+# Env / secrets
+.env
+.env.*
