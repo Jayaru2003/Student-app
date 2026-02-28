@@ -3,7 +3,7 @@ name: Deploy QA to Azure VM
 
 on:
   push:
-    branches: ["develop"]
+    branches: ["main"]
     # 👆 Whenever code is pushed to develop branch,
     # this pipeline will run automatically (QA deploy)
 
