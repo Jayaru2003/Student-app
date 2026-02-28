@@ -10,7 +10,7 @@ services:
       - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Server=tcp:test-project1.database.windows.net,1433;Initial Catalog=Test-project;Persist Security Info=False;User ID=admin123;Password=Jayaru123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+      - ConnectionStrings__DefaultConnection=Server=tcp:qa-server-testproject.database.windows.net,1433;Initial Catalog=QA-test;Persist Security Info=False;User ID=admin123;Password=Jayaru123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
     restart: on-failure
 
   frontend:

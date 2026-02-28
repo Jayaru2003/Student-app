@@ -9,7 +9,7 @@ RUN dotnet restore StudentInfo.Api/StudentInfo.Api.csproj
 # Copy all source and publish
 COPY src/StudentInfo.Api/ StudentInfo.Api/
 WORKDIR /src/StudentInfo.Api
-RUN dotnet publish -c Release -o /app/publish --no-restore
+RUN dotnet publish -c Release -o /app/publish
 
 # ── Stage 2: Runtime ─────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final

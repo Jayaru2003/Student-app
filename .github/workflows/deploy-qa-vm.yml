@@ -1,0 +1,62 @@
+name: Deploy QA to Azure VM
+# 👆 Workflow name (visible in GitHub Actions UI)
+
+on:
+  push:
+    branches: ["develop"]
+    # 👆 Whenever code is pushed to develop branch,
+    # this pipeline will run automatically (QA deploy)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # 👆 GitHub-hosted runner (Linux)
+
+    steps:
+      # 1️⃣ Pull repository code into the runner
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Install .NET SDK (same version as your project)
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      # 3️⃣ Build & publish the application
+      - name: Publish application
+        run: |
+          dotnet restore backend/src/StudentInfo.Api/StudentInfo.Api.csproj
+          dotnet publish backend/src/StudentInfo.Api/StudentInfo.Api.csproj -c Release -o publish
+        # 👆 Output will be in ./publish folder
+
+      # 4️⃣ Copy published files to Azure VM using SCP (SSH)
+      - name: Copy files to Azure VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.QA_VM_HOST }} # VM public IP / DNS
+          username: ${{ secrets.QA_VM_USER }} # usually azureuser
+          key: ${{ secrets.QA_VM_SSH_KEY }} # private SSH key
+          source: "publish/*" # local files
+          target: ${{ secrets.QA_APP_PATH }} # /var/www/myapp-qa
+          strip_components: 1
+
+      # 5️⃣ Configure environment variables & restart QA service
+      - name: Restart QA service
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.QA_VM_HOST }}
+          username: ${{ secrets.QA_VM_USER }}
+          key: ${{ secrets.QA_VM_SSH_KEY }}
+          script: |
+            sudo mkdir -p /etc/myapp
+
+            # Save DB connection string securely
+            echo "ConnectionStrings__DefaultConnection=${{ secrets.QA_CONNECTION_STRING }}" \
+              | sudo tee /etc/myapp/qa.env
+
+            # Restart QA app
+            sudo systemctl restart myapp-qa
+
+            # Show service status (for debugging)
+            sudo systemctl --no-pager status myapp-qa
