@@ -29,7 +29,10 @@ jobs:
       AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
     steps:
-      - name: Checkout
+      - name: Checkout      az account set --subscription c20b0c37-ef83-4912-80a8-8c35c7ad1194
+      az staticwebapp show --name studentappdetails --resource-group NetworkWatcherRG --query "{name:name,defaultHostname:properties.defaultHostname}"
+      az staticwebapp secrets list --name studentappdetails --resource-group NetworkWatcherRG --query properties.apiKey -o tsv      gh secret set AZURE_SWA_NAME --body 'studentappdetails' --repo OWNER/REPO
+      gh secret set AZURE_SWA_TOKEN --body '9286729ad8b67ffcd40c15a4d86941e77c64c43bbe84ef12aed6f99cddfd595504-2a1bf1fc-36ca-4286-95d1-241556438dda000043202e73d600' --repo OWNER/REPO
         uses: actions/checkout@v4
 
       # Build only; assumes Web App and Static Web App already exist.
