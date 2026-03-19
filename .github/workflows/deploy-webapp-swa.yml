@@ -11,74 +11,62 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-      WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
-      APP_SERVICE_PLAN: ${{ secrets.AZURE_APP_SERVICE_PLAN }}
-      SWA_NAME: ${{ secrets.AZURE_SWA_NAME }}
-      SWA_TOKEN: ${{ secrets.AZURE_SWA_TOKEN }}
-      AZURE_SWA_URL: https://green-mud-02e73d600.4.azurestaticapps.net
-      AZURE_SWA_RESOURCE_GROUP: NetworkWatcherRG
-      CONNECTION_STRING: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
-      SQL_SERVER_NAME: ${{ secrets.AZURE_SQL_SERVER_NAME }}
-      SQL_DB_NAME: ${{ secrets.AZURE_SQL_DB_NAME }}
-
-      # Publish profile secret for backend deploy (no service principal needed)
-      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-
+    
     steps:
-      - name: Checkout      az account set --subscription c20b0c37-ef83-4912-80a8-8c35c7ad1194
-      az staticwebapp show --name studentappdetails --resource-group NetworkWatcherRG --query "{name:name,defaultHostname:properties.defaultHostname}"
-      az staticwebapp secrets list --name studentappdetails --resource-group NetworkWatcherRG --query properties.apiKey -o tsv      gh secret set AZURE_SWA_NAME --body 'studentappdetails' --repo OWNER/REPO
-      gh secret set AZURE_SWA_TOKEN --body '9286729ad8b67ffcd40c15a4d86941e77c64c43bbe84ef12aed6f99cddfd595504-2a1bf1fc-36ca-4286-95d1-241556438dda000043202e73d600' --repo OWNER/REPO
+      # 1. Checkout the code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # Build only; assumes Web App and Static Web App already exist.
-      - name: Build SQL connection string
-        run: |
-          if [ -n "$CONNECTION_STRING" ]; then
-            echo "Using provided CONNECTION_STRING secret"
-          elif [ -n "$SQL_SERVER_NAME" ] && [ -n "$SQL_DB_NAME" ] && [ -n "$SQL_ADMIN_LOGIN" ] && [ -n "$SQL_ADMIN_PASSWORD" ]; then
-            echo "CONNECTION_STRING=Server=tcp:${SQL_SERVER_NAME}.database.windows.net,1433;Initial Catalog=${SQL_DB_NAME};Persist Security Info=False;User ID=${SQL_ADMIN_LOGIN};Password=${SQL_ADMIN_PASSWORD};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" >> $GITHUB_ENV
-          else
-            echo "No database credentials provided; continuing without CONNECTION_STRING"
-          fi
-
+      # 2. Setup .NET for Backend
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
-      - name: Publish backend
+      # 3. Build and Publish Backend
+      - name: Build and Publish Backend
         run: |
           dotnet restore backend/src/StudentInfo.Api/StudentInfo.Api.csproj
-          dotnet publish backend/src/StudentInfo.Api/StudentInfo.Api.csproj -c Release -o publish
+          dotnet publish backend/src/StudentInfo.Api/StudentInfo.Api.csproj -c Release -o ./publish
 
-      - name: Deploy backend to Web App
+      # 4. Deploy Backend to Azure Web App
+      - name: Deploy Backend to Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: publish
+          package: ./publish
 
+      # 5. Setup Node for Frontend
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20.x"
 
-      - name: Build frontend
+      # 6. Build Frontend
+      - name: Build Frontend
         working-directory: frontend
         run: |
           npm ci
           npm run build
 
-      - name: Deploy frontend to Static Web App
+      # 7. Deploy Frontend to Static Web App
+      - name: Deploy Frontend to SWA
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_SWA_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: upload
-          app_location: "frontend"
-          output_location: "dist"
+          action: "upload"
+          
+          # Location of the source code
+          app_location: "frontend" 
+          
+          # Location of the build output (dist or build folder)
+          # Based on standard Vite/React apps, this is usually 'dist'
+          app_artifact_location: "dist" 
+          
+          # If you don't have a separate Azure Function API in the SWA
+          api_location: "" 
+          
+          # Skip the SWA internal build because we did it in Step 6
+          skip_app_build: true
