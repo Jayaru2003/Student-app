@@ -54,10 +54,6 @@ jobs:
           output_location: "dist"
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-
-          # Location of the source code
           app_location: "frontend"
 
           # Location of the build output (dist or build folder)
