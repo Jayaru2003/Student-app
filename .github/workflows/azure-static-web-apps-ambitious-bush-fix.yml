@@ -1,4 +1,5 @@
-name: Azure Static Web Apps CI/CD (fix)
+az login
+az account set --subscription c20b0c37-ef83-4912-80a8-8c35c7ad1194name: Azure Static Web Apps CI/CD (fix)
 
 on:
   push:
@@ -36,7 +37,9 @@ jobs:
           action: "upload"
           app_location: "./frontend"
           api_location: ""
-          output_location: "dist"
+          # Upload the built artifact instead of the source
+          app_artifact_location: "dist"
+          skip_app_build: true
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
