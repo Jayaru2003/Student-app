@@ -43,14 +43,7 @@ jobs:
         with:
           node-version: "20.x"
 
-      # 6. Build Frontend
-      - name: Build Frontend
-        working-directory: frontend
-        run: |
-          npm ci
-          npm run build
-
-      # 7. Deploy Frontend to Static Web App
+      # 6. Deploy Frontend to SWA (Let SWA Action handle the build)
       - name: Deploy Frontend to SWA
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -62,11 +55,10 @@ jobs:
           app_location: "frontend" 
           
           # Location of the build output (dist or build folder)
-          # Based on standard Vite/React apps, this is usually 'dist'
           app_artifact_location: "dist" 
           
           # If you don't have a separate Azure Function API in the SWA
           api_location: "" 
           
-          # Skip the SWA internal build because we did it in Step 6
-          skip_app_build: true
+          # Use the built-in Oryx builder
+          skip_app_build: false
