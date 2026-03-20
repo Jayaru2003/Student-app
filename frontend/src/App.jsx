@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 
 const API = import.meta.env.VITE_API_URL || '/api/students'
+const HEALTH = API.startsWith('http') ? `${new URL(API).origin}/health` : '/health'
 
 // ── Toast hook ──────────────────────────────────────────────
 function useToast() {
@@ -160,7 +161,7 @@ export default function App() {
   // Health check
   const checkHealth = useCallback(async () => {
     try {
-      const res = await fetch('/health')
+      const res = await fetch(HEALTH)
       setHealth(res.ok ? 'healthy' : 'unhealthy')
     } catch {
       setHealth('unhealthy')
