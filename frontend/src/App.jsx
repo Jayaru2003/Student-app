@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 
-const API = '/api/students'
+const API = import.meta.env.VITE_API_URL || '/api/students'
 
 // ── Toast hook ──────────────────────────────────────────────
 function useToast() {

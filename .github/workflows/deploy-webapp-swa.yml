@@ -11,7 +11,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       # 1. Checkout the code
       - name: Checkout
@@ -48,17 +48,19 @@ jobs:
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_SWA_TOKEN }}
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          
+
           # Location of the source code
-          app_location: "frontend" 
-          
+          app_location: "frontend"
+
           # Location of the build output (dist or build folder)
-          app_artifact_location: "dist" 
-          
+          app_artifact_location: "dist"
+
           # If you don't have a separate Azure Function API in the SWA
-          api_location: "" 
-          
+          api_location: ""
+
           # Use the built-in Oryx builder
           skip_app_build: false
