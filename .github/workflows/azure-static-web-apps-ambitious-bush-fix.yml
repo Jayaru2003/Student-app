@@ -1,5 +1,4 @@
-az login
-az account set --subscription c20b0c37-ef83-4912-80a8-8c35c7ad1194name: Azure Static Web Apps CI/CD (fix)
+name: Azure Static Web Apps CI/CD (fix)
 
 on:
   push:
