@@ -12,6 +12,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var conn = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (string.IsNullOrEmpty(conn))
+    {
+        throw new InvalidOperationException("Connection string 'DefaultConnection' is not found or empty.");
+    }
+
     options.UseSqlServer(conn, sqlOptions =>
     {
         sqlOptions.EnableRetryOnFailure(

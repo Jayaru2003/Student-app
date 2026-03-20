@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>StudentInfo.Api</RootNamespace>
     <AssemblyName>StudentInfo.Api</AssemblyName>
+    <UserSecretsId>8bf22466-4875-4cfb-b55b-29b9c790fec1</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
