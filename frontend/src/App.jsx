@@ -191,18 +191,17 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
-      if (res.status === 400) {
+      if (!res.ok) {
         const msg = await res.text()
-        toast(msg || 'Bad request', 'error')
+        toast(msg || `Request failed (${res.status})`, 'error')
         return
       }
-      if (!res.ok) throw new Error()
       const created = await res.json()
       setStudents(s => [...s, created])
       setForm({ name: '', email: '', mobileNo: '' })
       toast('Student added ✓')
-    } catch {
-      toast('Failed to add student', 'error')
+    } catch (err) {
+      toast(`Failed to add student: ${err?.message || 'Network error'}`, 'error')
     } finally {
       setSubmitting(false)
     }

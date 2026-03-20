@@ -53,4 +53,4 @@ jobs:
           app_location: "frontend"
           output_location: "dist"
         env:
-          VITE_API_URL: https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/students
+          VITE_API_URL: https://studentappdetails-d8ebdjdkc0afd3bp.centralindia-01.azurewebsites.net/api/students
